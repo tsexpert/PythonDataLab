@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>432b3815-b754-4931-bc8e-b84f83fde9bc</TargetProject>
+    <FriendlyName>PythonClassifierApplication1</FriendlyName>
+  </ProjectTarget>
+  <Reports>
+    <Report>
+      <Filename>C:\Users\vladi\AppData\Local\Temp\PythonClassifierApplication1_20180417.vsp</Filename>
+    </Report>
+  </Reports>
+</ProfilingTarget>
