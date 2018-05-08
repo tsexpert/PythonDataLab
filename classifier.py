@@ -4,6 +4,7 @@
 
 # Глобальные переменные
 urlprov = "Provinces.xlsx"
+# Для нашей работы берем данные за 10 лет: с 2007 по 2017
 urlmean = "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_provinceData.php?country=UKR&year1=2007&year2=2017&type=Mean&provinceID="
 urlparea = "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_provinceData.php?country=UKR&year1=2007&year2=2017&type=VHI_Parea&provinceID="
 
@@ -14,6 +15,90 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 import seaborn
+
+from spyre import server
+
+server.include_df_index = True
+
+# =====================================================================
+class StockExample(server.App):
+	
+	def __init__(self):
+		# инициализация объекта класса
+
+		# открываем таблицу с названиями областей
+		self.provinces = pd.read_excel(
+			urlprov,			# имя файла
+			index_col=None,		# столбец индексов
+			header=0,			# используем первую строку в качестве названий столбцов
+			usecols = 'B:C'		# используем колонки с названием и номером области
+		)
+		self.provinces.columns = ['label','value']				# переименовываем колонки
+		self.optionlist = self.provinces.to_dict(orient='records')	# сохраняем в виде листа
+		self.inputs = [{
+			"type": 'dropdown',
+			"label": 'Company',
+			"options": self.optionlist,
+			"value": 22,
+			"key": 'region',
+			"action_id": "update_data"
+		}]
+
+		print('stop')
+		
+	title = "Historical Stock Prices"
+
+	#inputs = [{
+ #       "type": 'dropdown',
+ #       "label": 'Company',
+ #       "options": self.optionlist,
+ #       "value": 22,
+ #       "key": 'region',
+ #       "action_id": "update_data"
+ #   }]
+
+	controls = [{
+        "type": "button",
+        "id": "update_data",
+        "label": "get data"
+    }]
+
+	tabs = ["Plot", "Table"]
+
+	outputs = [
+        {
+            "type": "plot",
+            "id": "plot",
+            "control_id": "update_data",
+            "tab": "Plot"},
+        {
+            "type": "table",
+            "id": "table_id",
+            "control_id": "update_data",
+            "tab": "Table",
+            "on_page_load": True
+        }
+    ]
+
+	def getData(self, params):
+		region = params['region']
+		if region == 'empty':
+			region = 22
+
+		# создаём url файла в формате '1-Vinnytsya.csv'
+		url = str(region) + '-' + self.provinces[self.provinces.value == int(region)].iloc[0, 0] + '.csv'
+
+		# загружаем данные по заданой области из файла
+		print("Reading data from file " + url)
+		frame = pd.read_csv(
+			url,											# адрес источника данных
+			index_col = 0,									# столбец индексов
+			usecols = ['datetime','VCI','TCI','VHI'],		# считываем только нужные колонки
+			parse_dates = ['datetime']						# восстанавливаем столбец даты
+		)
+
+		# возвращаем dataframe с данными по заданной области
+		return frame
 
 # =====================================================================
 def download_data():
@@ -178,7 +263,7 @@ if __name__ == '__main__':
 	# Task 2.
 	# Зчитати завантажені текстові файли у фрейм (за номером області)
 	region = '1'
-	frame = read_data(region)
+	#frame = read_data(region)
 
 	# Task 3.
 	# Ряд VHI для області за рік, пошук екстремумів (min та max)
@@ -190,7 +275,10 @@ if __name__ == '__main__':
 	# Ряд VHI за всі роки для області,
 	# виявити роки з екстремальними посухами (6 < VHI < 15),
 	# які торкнулися більше вказаного відсотка області
-	droughts(frame, 10)
+	#droughts(frame, 10)
 
 	# Task 5. 
 	# Аналогічно для помірних посух (26 < VHI < 35)
+
+	app = StockExample()
+	app.launch(port=9093)
