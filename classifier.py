@@ -12,7 +12,7 @@ urlparea = "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_provinceData.ph
 import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import datetime
 import seaborn
 
@@ -104,16 +104,17 @@ class WebDataOutput(server.App):
 
 		region = params['region']
 		indx = params['indx']
-		startdate = pd.datetime.strptime(params['yr'] + '-' + params['mth'], "%Y-%m")
-		endyr = params['yr'] + params['yr_n']
-		enddate = pd.datetime.strptime(params['yr'] + '-' + params['mth'], "%Y-%m")
-		print(startdate)
-		print(enddate)
+		yr = params['yr']
+		mth = params['mth']
+		yr_n = params['yr_n']
+		startdate = datetime.date(int(yr),int(mth),1)
+		endyr = yr + yr_n
+		enddate = datetime.date(int(endyr),int(mth),1)
+
 		# создаём url файла в формате '1-Vinnytsya.csv'
 		url = str(region) + '-' + self.provinces[self.provinces.value == int(region)].iloc[0, 0] + '.csv'
 
 		# загружаем данные по заданой области из файла
-		print("Reading data from file " + url)
 		frame = pd.read_csv(
 			url,								# адрес источника данных
 			index_col = 0,						# столбец индексов
@@ -122,6 +123,7 @@ class WebDataOutput(server.App):
 		)
 
 		# возвращаем dataframe с данными по заданной области
+		frame = frame[startdate:enddate]
 		return frame
 
 # =====================================================================
