@@ -21,10 +21,10 @@ from spyre import server
 server.include_df_index = True
 
 # =====================================================================
-class StockExample(server.App):
+class WebDataOutput(server.App):
 	
 	def __init__(self):
-		# инициализация объекта класса
+		# инициализация нового объекта класса
 
 		# открываем таблицу с названиями областей
 		self.provinces = pd.read_excel(
@@ -33,29 +33,48 @@ class StockExample(server.App):
 			header=0,			# используем первую строку в качестве названий столбцов
 			usecols = 'B:C'		# используем колонки с названием и номером области
 		)
-		self.provinces.columns = ['label','value']				# переименовываем колонки
-		self.optionlist = self.provinces.to_dict(orient='records')	# сохраняем в виде листа
-		self.inputs = [{
+		self.provinces.columns = ['label','value']					# переименовываем колонки
+		self.optionlist = self.provinces.to_dict(orient='records')	# сохраняем в виде dictionary
+		self.inputs = [
+			{
 			"type": 'dropdown',
-			"label": 'Company',
+			"label": 'Область',
 			"options": self.optionlist,
 			"value": 22,
-			"key": 'region',
-			"action_id": "update_data"
-		}]
-
-		print('stop')
+			"key": 'region'},
+			{
+			"type": 'dropdown',
+			"label": 'Индекс',
+			"options": [
+            {"label": "VCI", "value": "VCI"},
+            {"label": "TCI", "value": "TCI"},
+            {"label": "VHI", "value": "VHI"}],
+			"value": 'VHI',
+			"key": 'indx'},
+			{
+			"type": 'slider',
+			"label": 'Начальный год',
+			"value": 2007,
+			"min" : 2007,
+			"max" : 2017,
+			"key": 'yr'},
+			{
+			"type": 'slider',
+			"label": 'Начальный месяц',
+			"value": 1,
+			"min" : 1,
+			"max" : 12,
+			"key": 'mth'},
+			{
+			"type": 'slider',
+			"label": 'Кол-во лет',
+			"value": 1,
+			"min" : 1,
+			"max" : 10,
+			"key": 'yr_n'},
+			]
 		
-	title = "Historical Stock Prices"
-
-	#inputs = [{
- #       "type": 'dropdown',
- #       "label": 'Company',
- #       "options": self.optionlist,
- #       "value": 22,
- #       "key": 'region',
- #       "action_id": "update_data"
- #   }]
+	title = "Вегетаційний індекс"
 
 	controls = [{
         "type": "button",
@@ -81,20 +100,25 @@ class StockExample(server.App):
     ]
 
 	def getData(self, params):
-		region = params['region']
-		if region == 'empty':
-			region = 22
+		# запрос данных по выбранным параметрам
 
+		region = params['region']
+		indx = params['indx']
+		startdate = pd.datetime.strptime(params['yr'] + '-' + params['mth'], "%Y-%m")
+		endyr = params['yr'] + params['yr_n']
+		enddate = pd.datetime.strptime(params['yr'] + '-' + params['mth'], "%Y-%m")
+		print(startdate)
+		print(enddate)
 		# создаём url файла в формате '1-Vinnytsya.csv'
 		url = str(region) + '-' + self.provinces[self.provinces.value == int(region)].iloc[0, 0] + '.csv'
 
 		# загружаем данные по заданой области из файла
 		print("Reading data from file " + url)
 		frame = pd.read_csv(
-			url,											# адрес источника данных
-			index_col = 0,									# столбец индексов
-			usecols = ['datetime','VCI','TCI','VHI'],		# считываем только нужные колонки
-			parse_dates = ['datetime']						# восстанавливаем столбец даты
+			url,								# адрес источника данных
+			index_col = 0,						# столбец индексов
+			usecols = ['datetime', indx],		# считываем только нужные колонки
+			parse_dates = ['datetime']			# восстанавливаем столбец даты
 		)
 
 		# возвращаем dataframe с данными по заданной области
@@ -280,5 +304,5 @@ if __name__ == '__main__':
 	# Task 5. 
 	# Аналогічно для помірних посух (26 < VHI < 35)
 
-	app = StockExample()
+	app = WebDataOutput()
 	app.launch(port=9093)
