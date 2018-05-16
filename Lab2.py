@@ -28,9 +28,9 @@ class WebDataOutput(server.App):
 		)
 		self.provinces.columns = ['label','value']					# переименовываем колонки
 		self.optionlist = self.provinces.to_dict(orient='records')	# сохраняем в виде dictionary
-		self.inputs = [{
-			"type": 'dropdown',
-			"label": 'Область',
+		self.inputs = [{						# элементы управления для выборки данных
+			"type": 'dropdown',					# тип элемента управления
+			"label": 'Область',					# 
 			"options": self.optionlist,
 			"value": 22,
 			"key": 'region'},
