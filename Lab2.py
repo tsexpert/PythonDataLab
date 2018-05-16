@@ -103,7 +103,8 @@ class WebDataOutput(server.App):
 		url = str(region) + '-' + self.provinces[self.provinces.value == int(region)].iloc[0, 0] + '.csv'
 
 		# загружаем данные по заданой области из файла
-		frame = pd.read_csv(url,								# адрес источника данных
+		frame = pd.read_csv(
+			url,								# адрес источника данных
 			index_col = 0,						# столбец индексов
 			usecols = ['datetime', indx],		# считываем только нужные колонки
 			parse_dates = ['datetime']			# восстанавливаем столбец даты
@@ -118,9 +119,6 @@ if __name__ == '__main__':
 	'''
 	Функція main
 	'''
-	
-	# устанавливаем рабочую директорию
-	os.chdir("C:\\Users\\vladi\\OneDrive\\СЕМЬЯ\\Политех\\repos\\PythonClassifierApplication1")
 
 	# запускаем web приложение
 	app = WebDataOutput()

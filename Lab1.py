@@ -111,8 +111,13 @@ def find_min_max(frame, year):
 	'''
 
 	# обираємо вегетаційний період з вересня по липень наступного року
-	frame = frame[frame['datetime'].between(datetime.date(year, 9, 1), datetime.date(year + 1, 8, 31))]
-
+	# frame = frame[frame['datetime'].between(datetime.date(year, 9, 1), datetime.date(year + 1, 8, 31))]
+	# starttme = datetime.date(year, 9, 1)
+	starttme = str(year) + '-09-01'
+	# endtime = datetime.date(year + 1, 8, 31)
+	endtime = str(year+1) + '-08-31'
+	# frame.set_index('datetime')
+	frame = frame[(frame['datetime'] >= starttme) & (frame['datetime'] < endtime)]
 	# пошук екстремумів (min та max)
 	minvalue = frame['VHI'].idxmin()
 	maxvalue = frame['VHI'].idxmax()
@@ -167,7 +172,7 @@ if __name__ == '__main__':
 	'''
 	
 	# устанавливаем рабочую директорию
-	os.chdir("C:\\Users\\vladi\\OneDrive\\СЕМЬЯ\\Политех\\repos\\PythonClassifierApplication1")
+	#os.chdir("C:\\Users\\vladi\\OneDrive\\СЕМЬЯ\\Политех\\repos\\PythonClassifierApplication1")
 
 	# Task 1.
 	# Для кожної із адміністративних одиниць України завантажити тестові
