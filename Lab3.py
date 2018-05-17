@@ -11,12 +11,12 @@ Date;Time;Global_active_power;Global_reactive_power;Voltage;Global_intensity;Sub
 url = "household_power_consumption.zip"
 
 # Импорт модулей
-import os
+#import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import datetime
-import seaborn
+#import seaborn
 
 # =====================================================================
 def read_data():
@@ -45,69 +45,11 @@ def read_data():
 		#low_memory = False			# убираем предупреждения системы
 	)
 
+	# убираем строки с отсутствующими данными
+	frame.dropna(inplace=True)
+
 	# возвращаем dataframe с данными по заданной области
 	return frame
-
-# =====================================================================
-def find_min_max(frame, year):
-	'''
-	Ряд VHI для області за рік, пошук екстремумів (min та max)
-	'''
-
-	# обираємо вегетаційний період з вересня по липень наступного року
-	# frame = frame[frame['datetime'].between(datetime.date(year, 9, 1), datetime.date(year + 1, 8, 31))]
-	# starttme = datetime.date(year, 9, 1)
-	starttme = str(year) + '-09-01'
-	# endtime = datetime.date(year + 1, 8, 31)
-	endtime = str(year+1) + '-08-31'
-	# frame.set_index('datetime')
-	frame = frame[(frame['datetime'] >= starttme) & (frame['datetime'] < endtime)]
-	# пошук екстремумів (min та max)
-	minvalue = frame['VHI'].idxmin()
-	maxvalue = frame['VHI'].idxmax()
-	print("Minimum VHI value: " + str(frame['VHI'][minvalue]) + " was on " + str(frame['datetime'][minvalue].strftime('%d %B %Y')))
-	print("Maximum VHI value: " + str(frame['VHI'][maxvalue]) + " was on " + str(frame['datetime'][maxvalue].strftime('%d %B %Y')))
-
-	# відображення ряду VHI за вегетаційний період
-	plot(frame)
-
-	return
-
-# =====================================================================
-def droughts(frame, percent):
-	'''
-	Ряд VHI за всі роки для області, виявити роки з екстремальними посухами, 
-	які торкнулися більше вказаного відсотка області
-	'''
-	frame['VHI'] = frame['0'] + frame['5']
-	plot(frame)
-
-	return
-
-# =====================================================================
-def plot(results):
-    '''
-    Create a plot
-    '''
-
-    # Preparing the plot
-    fig = plt.figure()
-    fig.canvas.set_window_title('VHI index')
-    plt.plot(results['datetime'], results['VHI'])
-
-    plt.title('VHI for the year')
-    plt.xlabel('Date')
-    plt.ylabel('VHI average')
-    plt.legend(loc='lower left')
-
-    # Let matplotlib improve the layout
-    plt.tight_layout()
-
-    # Display the plot in interactive UI
-    plt.show()
-
-    # Closing the figure allows matplotlib to release the memory used.
-    plt.close()
 
 # =====================================================================
 if __name__ == '__main__':
@@ -117,16 +59,39 @@ if __name__ == '__main__':
 	# Считываем данные в pandas фрейм
 	frame = read_data()
 
-	# Отделяем столбец с датой в отдельный фрейм. В оставшемся фрейме - только числовые данные по потреблению
-	frame_split = np.split(frame, [1], axis=1)
-		
-	# Преобразуем фрейм в numpy array
-	narray = frame_split[1].reset_index().values
-		
+	# Убираем столбец с датой
+	frame_clean = frame.drop(['Datetime'], axis=1)
+
+	# Преобразуем фрейм в numpy array с сохранением индекса
+	narray = frame_clean.reset_index().values
+	del frame_clean		# удаляем ненужный фрейм
+	
 	#1.	
 	# Обрати всі домогосподарства, у яких загальна активна споживана потужність перевищує 5 кВт.
+	# с использованием pandas dataframe
+	# засекаем время
+	starttime = datetime.datetime.now()
+
 	frame_5KW = frame[frame['Global_active_power'] > 5.0]
+
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
 	print(frame_5KW)
+	print(timedelta)
+
+	# с использованием numpy array
+	# засекаем время
+	starttime = datetime.datetime.now()
+
+	frame_5KW = narray[np.where(narray[:,1]>5.0)]
+	
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	print(frame_5KW)
+	print(timedelta)
+
 	#2.	
 	# Обрати всі домогосподарства, у яких вольтаж перевищую 235 В.
 
