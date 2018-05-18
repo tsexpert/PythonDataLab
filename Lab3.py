@@ -247,16 +247,16 @@ def task5():
 	array_res = frame_res.values
 	# делим выборку на группы:
 	# группа 1: пральна машина, сушарка, холодильник та освітлення 
-	array1 = array_res[np.argmax(array_res[:5,8], axis=1) == 1]
-	array2 = array_res[np.argmax(array_res[:5,8], axis=1) != 1]
+	array1 = array_res[np.argmax(array_res[:,5:8], axis=1) == 1]
+	array2 = array_res[np.argmax(array_res[:,5:8], axis=1) != 1]
 	# останавливаем время
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(array1)
-	print(array1.iloc[2::3,:])
+	print(array1[2::3,:])
 	print(array2)
-	print(array1.iloc[3::4,:])
+	print(array1[3::4,:])
 	print(timedelta)
 
 	return
