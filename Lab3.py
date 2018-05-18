@@ -119,6 +119,50 @@ def task2():
 
 # =====================================================================
 
+def task3():
+	'''
+	Завдання 3.	
+	Обрати всі домогосподарства, у яких сила струму лежить в межах 19-20 А, для них виявити ті,
+	у яких пральна машина та холодильних споживають більше, ніж бойлер та кондиціонер.
+	'''
+	global dataframe		# используем переменную из функции main
+	global nparray			# используем переменную из функции main
+	ampmin = 19.0			# нижнее значение силы тока по заданию
+	ampmax = 20.0			# верхнее значение силы тока по заданию
+	
+	print('Task 3')
+	# с использованием pandas dataframe
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем фильтр к фрейму
+	frame_res = dataframe[(dataframe['Global_intensity'] > ampmin) & (dataframe['Global_intensity'] < ampmax)]
+	# применяем дополнительный фильтр
+	frame_res = frame_res[frame_res['Sub_metering_2'] > frame_res['Sub_metering_3']]
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(frame_res.loc[:,'Global_intensity'])
+	print(timedelta)
+
+	# с использованием numpy array
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем фильтр к массиву
+	array_res = nparray[(nparray[:,4] > ampmin) & (nparray[:,4] < ampmax)]
+	# применяем дополнительный фильтр
+	array_res = array_res[array_res[:,6] > array_res[:,7]]
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(array_res[:,[0,4]])
+	print(timedelta)
+
+	return
+
+# =====================================================================
+
 if __name__ == '__main__':
 	'''
 	Функція main
@@ -128,6 +172,7 @@ if __name__ == '__main__':
 
 	# Убираем столбец с датой и
 	# Преобразуем фрейм в numpy array с сохранением индекса
+	print('Creating numpy array\n')
 	nparray = dataframe.drop(['Datetime'], axis=1).reset_index().values
 	
 	# Завдання 1.	
@@ -136,37 +181,12 @@ if __name__ == '__main__':
 
 	# Завдання 2.	
 	# Обрати всі домогосподарства, у яких вольтаж перевищую 235 В.
-	task2()
+	#task2()
 
 	# Завдання 3.	
 	# Обрати всі домогосподарства, у яких сила струму лежить в межах 19-20 А, для них виявити ті,
 	# у яких пральна машина та холодильних споживають більше, ніж бойлер та кондиціонер.
-	ampmin = 19.0
-	ampmax = 20.0
-	print('Task 3')
-	# с использованием pandas dataframe
-	# засекаем время
-	starttime = datetime.datetime.now()
-
-	frame_res = frame[frame['Voltage'] > voltage]
-
-	# останавливаем время
-	endtime = datetime.datetime.now()
-	timedelta = endtime - starttime
-	print(frame_res)
-	print(timedelta)
-
-	# с использованием numpy array
-	# засекаем время
-	starttime = datetime.datetime.now()
-
-	array_res = narray[np.where(narray[:,3] > voltage)]
-	
-	# останавливаем время
-	endtime = datetime.datetime.now()
-	timedelta = endtime - starttime
-	print(array_res)
-	print(timedelta)
+	task3()
 
 	# Завдання 4.	
 	# Обрати випадковим чином 500000 домогосподарств (без повторів елементів вибірки),
