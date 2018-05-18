@@ -7,9 +7,6 @@ Date;Time;Global_active_power;Global_reactive_power;Voltage;Global_intensity;Sub
 16/12/2006;17:25:00;5.360;0.436;233.630;23.000;0.000;1.000;16.000
 '''
 
-# Глобальные переменные
-url = "household_power_consumption.zip"
-
 # Импорт модулей
 #import os
 import pandas as pd
@@ -17,6 +14,9 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import datetime
 #import seaborn
+
+# Глобальные переменные
+url = "household_power_consumption.zip"
 
 # =====================================================================
 def read_data():
@@ -29,82 +29,151 @@ def read_data():
 		url,						# адрес источника данных
 		sep = ';',					# сепаратор
 		header = 0,					# первая строка - названия столбцов
-        index_col = None,			# столбец индексов
+        index_col = None,			# столбец индексов отсутствует
 		parse_dates = {'Datetime' : ['Date','Time']},	# восстанавиливаем дату и время
 		infer_datetime_format = True,					# автоопределение формата даты/времени
-		#dtype = {										# задаём типы данных для ячеек
-		#	'Global_active_power' : np.float64,
-		#	'Global_reactive_power' : np.float64,
-		#	'Voltage;Global_intensity' : np.float64,
-		#	'Sub_metering_1' : np.float64,
-		#	'Sub_metering_2' : np.float64,
-		#	'Sub_metering_3' : np.float64,
-		#	},
-		na_values = '?',
-		#verbose = True,
-		#low_memory = False			# убираем предупреждения системы
+		na_values = '?',			# указываем какой символ применяется для неопределённых значений
 	)
 
 	# убираем строки с отсутствующими данными
 	frame.dropna(inplace=True)
 
-	# возвращаем dataframe с данными по заданной области
+	# возвращаем dataframe с данными
 	return frame
 
 # =====================================================================
+
+def task1():
+	'''
+	Завдання 1.	
+	Обрати всі домогосподарства, у яких загальна активна споживана потужність перевищує 5 кВт.
+	'''
+	global dataframe		# используем переменную из функции main
+	global nparray			# используем переменную из функции main
+	power = 5.0				# пороговое значение мощности по заданию
+	
+	print('Task 1')
+	# с использованием pandas dataframe
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем фильтр к фрейму
+	frame_res = dataframe[dataframe['Global_active_power'] > power]
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(frame_res.loc[:,'Global_active_power'])
+	print(timedelta)
+
+	# с использованием numpy array
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем фильтр к массиву
+	array_res = nparray[np.where(nparray[:,1] > power)]
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(array_res[:,[0,1]])
+	print(timedelta)
+
+	return
+
+# =====================================================================
+
+def task2():
+	'''
+	Завдання 2.	
+	Обрати всі домогосподарства, у яких вольтаж перевищую 235 В.
+	'''
+	global dataframe		# используем переменную из функции main
+	global nparray			# используем переменную из функции main
+	voltage = 235.0			# пороговое значение напряжения по заданию
+	
+	print('Task 2')
+	# с использованием pandas dataframe
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем фильтр к фрейму
+	frame_res = dataframe[dataframe['Voltage'] > voltage]
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(frame_res.loc[:,'Voltage'])
+	print(timedelta)
+
+	# с использованием numpy array
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем фильтр к массиву
+	array_res = nparray[np.where(nparray[:,3] > voltage)]
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(array_res[:,[0,3]])
+	print(timedelta)
+
+	return
+
+# =====================================================================
+
 if __name__ == '__main__':
 	'''
 	Функція main
 	'''
 	# Считываем данные в pandas фрейм
-	frame = read_data()
+	dataframe = read_data()
 
-	# Убираем столбец с датой
-	frame_clean = frame.drop(['Datetime'], axis=1)
-
+	# Убираем столбец с датой и
 	# Преобразуем фрейм в numpy array с сохранением индекса
-	narray = frame_clean.reset_index().values
-	del frame_clean		# удаляем ненужный фрейм
+	nparray = dataframe.drop(['Datetime'], axis=1).reset_index().values
 	
-	#1.	
+	# Завдання 1.	
 	# Обрати всі домогосподарства, у яких загальна активна споживана потужність перевищує 5 кВт.
+	#task1()
+
+	# Завдання 2.	
+	# Обрати всі домогосподарства, у яких вольтаж перевищую 235 В.
+	task2()
+
+	# Завдання 3.	
+	# Обрати всі домогосподарства, у яких сила струму лежить в межах 19-20 А, для них виявити ті,
+	# у яких пральна машина та холодильних споживають більше, ніж бойлер та кондиціонер.
+	ampmin = 19.0
+	ampmax = 20.0
+	print('Task 3')
 	# с использованием pandas dataframe
 	# засекаем время
 	starttime = datetime.datetime.now()
 
-	frame_5KW = frame[frame['Global_active_power'] > 5.0]
+	frame_res = frame[frame['Voltage'] > voltage]
 
 	# останавливаем время
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
-	print(frame_5KW)
+	print(frame_res)
 	print(timedelta)
 
 	# с использованием numpy array
 	# засекаем время
 	starttime = datetime.datetime.now()
 
-	frame_5KW = narray[np.where(narray[:,1]>5.0)]
+	array_res = narray[np.where(narray[:,3] > voltage)]
 	
 	# останавливаем время
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
-	print(frame_5KW)
+	print(array_res)
 	print(timedelta)
 
-	#2.	
-	# Обрати всі домогосподарства, у яких вольтаж перевищую 235 В.
-
-	#3.	
-	# Обрати всі домогосподарства, у яких сила струму лежить в межах 19-20 А, для них виявити ті,
-	# у яких пральна машина та холодильних споживають більше, ніж бойлер та кондиціонер.
-
-	#4.	
+	# Завдання 4.	
 	# Обрати випадковим чином 500000 домогосподарств (без повторів елементів вибірки),
 	# для них обчислити середні величини усіх 3-х груп споживання електричної енергії, 
 	# а також
 
-	#5.	
+	# Завдання 5.	
 	# Обрати ті домогосподарства, які після 18-00 споживають понад 6 кВт за хвилину в середньому,
 	# серед відібраних визначити ті, у яких основне споживання електроенергії у вказаний проміжок часу
 	# припадає на пральну машину, сушарку, холодильник та освітлення (група 2 є найбільшою),
