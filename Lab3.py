@@ -14,6 +14,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 import datetime
 #import seaborn
+from random import sample
 
 # Глобальные переменные
 url = "household_power_consumption.zip"
@@ -163,6 +164,49 @@ def task3():
 
 # =====================================================================
 
+def task4():
+	'''
+	Завдання 4.	
+	Обрати випадковим чином 500000 домогосподарств (без повторів елементів вибірки),
+	для них обчислити середні величини усіх 3-х груп споживання електричної енергії
+	'''
+	global dataframe		# используем переменную из функции main
+	global nparray			# используем переменную из функции main
+	samples = 500000		# количество элементов выборки
+	
+	print('Task 4')
+	# с использованием pandas dataframe
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем выборку
+	#frame_res = dataframe[['Sub_metering_1','Sub_metering_2','Sub_metering_3']].sample(n=samples)
+	# вычисляем средние значения
+	mean = dataframe[['Sub_metering_1','Sub_metering_2','Sub_metering_3']].sample(n=samples).mean()
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(mean)
+	print(timedelta)
+
+	# с использованием numpy array
+	# засекаем время
+	starttime = datetime.datetime.now()
+	# применяем выборку к массиву
+	#array_res = nparray[np.random.choice(nparray.shape[0], size=samples, replace=False)]
+	# вычисляем средние значения
+	mean = np.mean(nparray[np.random.choice(nparray.shape[0], size=samples, replace=False)][:,5:8], axis=0)
+	# останавливаем время
+	endtime = datetime.datetime.now()
+	timedelta = endtime - starttime
+	# вывод результатов на экран
+	print(mean)
+	print(timedelta)
+
+	return
+
+# =====================================================================
+
 if __name__ == '__main__':
 	'''
 	Функція main
@@ -186,12 +230,12 @@ if __name__ == '__main__':
 	# Завдання 3.	
 	# Обрати всі домогосподарства, у яких сила струму лежить в межах 19-20 А, для них виявити ті,
 	# у яких пральна машина та холодильних споживають більше, ніж бойлер та кондиціонер.
-	task3()
+	#task3()
 
 	# Завдання 4.	
 	# Обрати випадковим чином 500000 домогосподарств (без повторів елементів вибірки),
-	# для них обчислити середні величини усіх 3-х груп споживання електричної енергії, 
-	# а також
+	# для них обчислити середні величини усіх 3-х груп споживання електричної енергії
+	task4()
 
 	# Завдання 5.	
 	# Обрати ті домогосподарства, які після 18-00 споживають понад 6 кВт за хвилину в середньому,
