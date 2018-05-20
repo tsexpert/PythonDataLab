@@ -8,12 +8,9 @@ Date;Time;Global_active_power;Global_reactive_power;Voltage;Global_intensity;Sub
 '''
 
 # Импорт модулей
-#import os
 import pandas as pd
 import numpy as np
-#import matplotlib.pyplot as plt
 import datetime
-#import seaborn
 from random import sample
 
 # Глобальные переменные
@@ -25,7 +22,7 @@ def read_data():
 	загрузка данных из файла в фрейм
 	'''
 
-	print("Reading data from file " + url)
+	print("Reading data from file " + url + "...")
 	frame = pd.read_csv(
 		url,						# адрес источника данных
 		sep = ';',					# сепаратор
@@ -38,7 +35,7 @@ def read_data():
 
 	# убираем строки с отсутствующими данными
 	frame.dropna(inplace=True)
-
+	print("Done!")
 	# возвращаем dataframe с данными
 	return frame
 
@@ -52,8 +49,8 @@ def task1():
 	global nparray			# используем переменную из функции main
 	power = 5.0				# пороговое значение мощности по заданию
 	
-	print('Task 1')
-	# с использованием pandas dataframe
+	print('\nTask 1')
+	#### с использованием pandas dataframe ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем фильтр к фрейму
@@ -63,9 +60,9 @@ def task1():
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(frame_res.loc[:,'Global_active_power'])
-	print(timedelta)
+	print('Pandas time: ' + str(timedelta))
 
-	# с использованием numpy array
+	#### с использованием numpy array ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем фильтр к массиву
@@ -75,7 +72,8 @@ def task1():
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(array_res[:,[0,1]])
-	print(timedelta)
+	print(array_res.shape)
+	print('Numpy time: ' + str(timedelta))
 
 	return
 
@@ -89,8 +87,8 @@ def task2():
 	global nparray			# используем переменную из функции main
 	voltage = 235.0			# пороговое значение напряжения по заданию
 	
-	print('Task 2')
-	# с использованием pandas dataframe
+	print('\nTask 2')
+	#### с использованием pandas dataframe ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем фильтр к фрейму
@@ -100,9 +98,9 @@ def task2():
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(frame_res.loc[:,'Voltage'])
-	print(timedelta)
+	print('Pandas time: ' + str(timedelta))
 
-	# с использованием numpy array
+	#### с использованием numpy array ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем фильтр к массиву
@@ -112,7 +110,8 @@ def task2():
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(array_res[:,[0,3]])
-	print(timedelta)
+	print(array_res.shape)
+	print('Numpy time: ' + str(timedelta))
 
 	return
 
@@ -128,8 +127,8 @@ def task3():
 	ampmin = 19.0			# нижнее значение силы тока по заданию
 	ampmax = 20.0			# верхнее значение силы тока по заданию
 	
-	print('Task 3')
-	# с использованием pandas dataframe
+	print('\nTask 3')
+	#### с использованием pandas dataframe ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем фильтр к фрейму
@@ -141,9 +140,9 @@ def task3():
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(frame_res.loc[:,'Global_intensity'])
-	print(timedelta)
+	print('Pandas time: ' + str(timedelta))
 
-	# с использованием numpy array
+	#### с использованием numpy array ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем фильтр к массиву
@@ -155,7 +154,8 @@ def task3():
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(array_res[:,[0,4]])
-	print(timedelta)
+	print(array_res.shape)
+	print('Numpy time: ' + str(timedelta))
 
 	return
 
@@ -170,36 +170,32 @@ def task4():
 	global nparray			# используем переменную из функции main
 	samples = 500000		# количество элементов выборки
 	
-	print('Task 4')
-	# с использованием pandas dataframe
+	print('\nTask 4')
+	#### с использованием pandas dataframe ####
 	# засекаем время
 	starttime = datetime.datetime.now()
-	# применяем выборку
-	#frame_res =
-	#dataframe[['Sub_metering_1','Sub_metering_2','Sub_metering_3']].sample(n=samples)
-	# вычисляем средние значения
+	# применяем выборку к фрейму
+	# и вычисляем средние значения
 	mean = dataframe[['Sub_metering_1','Sub_metering_2','Sub_metering_3']].sample(n=samples).mean()
 	# останавливаем время
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(mean)
-	print(timedelta)
+	print('Pandas time: ' + str(timedelta))
 
-	# с использованием numpy array
+	#### с использованием numpy array ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем выборку к массиву
-	#array_res = nparray[np.random.choice(nparray.shape[0], size=samples,
-	#replace=False)]
-	# вычисляем средние значения
+	# и вычисляем средние значения
 	mean = np.mean(nparray[np.random.choice(nparray.shape[0], size=samples, replace=False)][:,5:8], axis=0)
 	# останавливаем время
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(mean)
-	print(timedelta)
+	print('Numpy time: ' + str(timedelta))
 
 	return
 
@@ -217,8 +213,8 @@ def task5():
 	global nparray			# используем переменную из функции main
 	power = 6.0				# значение мощности
 
-	print('Task 5')
-	# с использованием pandas dataframe
+	print('\nTask 5')
+	#### с использованием pandas dataframe ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# применяем выборку по времени и мощности
@@ -232,32 +228,33 @@ def task5():
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
 	# вывод результатов на экран
-	print(frame1)
 	# каждый третий результат группы 1
 	print(frame1.iloc[2::3,:])
-	print(frame2)
 	# каждый четвертый результат группы 2
 	print(frame2.iloc[3::4,:])
-	print(timedelta)
+	print('Pandas time: ' + str(timedelta))
 
-	# с использованием numpy array
+	#### с использованием numpy array ####
 	# засекаем время
 	starttime = datetime.datetime.now()
 	# преобразуем отфильтрованный dataframe в numpy array с учётом условий задачи
 	array_res = frame_res.values
 	# делим выборку на группы:
 	# группа 1: пральна машина, сушарка, холодильник та освітлення 
-	array1 = array_res[np.argmax(array_res[:,5:8], axis=1) == 1]
-	array2 = array_res[np.argmax(array_res[:,5:8], axis=1) != 1]
+	# каждый третий результат группы 1
+	array1 = array_res[np.argmax(array_res[:,5:8], axis=1) == 1][2::3,:]
+	# группа 2: решта споживачів
+	# каждый четвертый результат группы 2
+	array2 = array_res[np.argmax(array_res[:,5:8], axis=1) != 1][3::4,:]
 	# останавливаем время
 	endtime = datetime.datetime.now()
 	timedelta = endtime - starttime
 	# вывод результатов на экран
 	print(array1)
-	print(array1[2::3,:])
+	print(array1.shape)
 	print(array2)
-	print(array1[3::4,:])
-	print(timedelta)
+	print(array2.shape)
+	print('Numpy time: ' + str(timedelta))
 
 	return
 
@@ -271,31 +268,32 @@ if __name__ == '__main__':
 
 	# Убираем столбец с датой и
 	# Преобразуем фрейм в numpy array с сохранением индекса
-	print('Creating numpy array\n')
+	print('Creating numpy array from dataframe\n')
 	nparray = dataframe.drop(['Datetime'], axis=1).reset_index().values
-	
+	print('Done!')
+
 	# Завдання 1.
 	# Обрати всі домогосподарства, у яких загальна активна споживана потужність
 	# перевищує 5 кВт.
-	#task1()
+	task1()
 
 	# Завдання 2.
 	# Обрати всі домогосподарства, у яких вольтаж перевищую 235 В.
-	#task2()
+	task2()
 
 	# Завдання 3.
 	# Обрати всі домогосподарства, у яких сила струму лежить в межах 19-20 А, для
 	# них виявити ті,
 	# у яких пральна машина та холодильних споживають більше, ніж бойлер та
 	# кондиціонер.
-	#task3()
+	task3()
 
 	# Завдання 4.
 	# Обрати випадковим чином 500000 домогосподарств (без повторів елементів
 	# вибірки),
 	# для них обчислити середні величини усіх 3-х груп споживання електричної
 	# енергії
-	#task4()
+	task4()
 
 	# Завдання 5.	
 	# Обрати ті домогосподарства, які після 18-00 споживають понад 6 кВт за хвилину в середньому,
