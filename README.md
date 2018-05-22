@@ -1,3 +1,3 @@
 # PythonDataLab
 Спеціальне програмування
-Lab works 1 and 2
+Lab works 1, 2, 3
