@@ -111,7 +111,7 @@ def find_min_max(frame, year):
 	# обираємо вегетаційний період з вересня по липень наступного року
 	starttme = str(year) + '-09-01'
 	endtime = str(year + 1) + '-08-31'
-	frame = frame[(frame['datetime'] >= starttme) & (frame['datetime'] < endtime)]
+	frame = frame[(frame['datetime'] >= starttme) & (frame['datetime'] <= endtime)]
 
 	# пошук екстремумів (min та max)
 	minvalue = frame['VHI'].idxmin()
