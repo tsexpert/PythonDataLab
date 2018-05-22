@@ -9,10 +9,10 @@ urlmean = "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_provinceData.php
 urlparea = "https://www.star.nesdis.noaa.gov/smcd/emb/vci/VH/get_provinceData.php?country=UKR&year1=2007&year2=2017&type=VHI_Parea&provinceID="
 
 # Импорт модулей
-import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import datetime
 import seaborn
 
@@ -26,8 +26,7 @@ def download_data():
 	dateparse = lambda x, y: pd.datetime.strptime(x + '-' + y + '-1', "%G-%V-%u")
 	
 	# открываем таблицу с названиями областей
-	provinces = pd.read_excel(
-		urlprov,			# имя файла
+	provinces = pd.read_excel(urlprov,			# имя файла
         index_col=None,		# столбец индексов
         header=0,			# используем первую строку в качестве названий столбцов
     )
@@ -37,8 +36,7 @@ def download_data():
 		
 		# считывваем информацию об индексах
 		url = urlmean + str(row['provinceID'])
-		frameMean = pd.read_table(
-			url,					# адрес источника данных
+		frameMean = pd.read_table(url,					# адрес источника данных
 			encoding='latin-1',		# кодировка
 			sep=r"[,\s]+",			# разделитель запятая или пробел
 			skipinitialspace=True,	# игнорировать пробелы после разделителя
@@ -54,8 +52,7 @@ def download_data():
 
 		# считываем информацию о процентах территории
 		url = urlparea + str(row['provinceID'])
-		frameParea = pd.read_table(
-			url,					# адрес источника данных
+		frameParea = pd.read_table(url,					# адрес источника данных
 			encoding='latin-1',		# кодировка
 			sep=r"[,\s]+",			# разделитель запятая или пробел
 			skipinitialspace=True,	# игнорировать пробелы после разделителя
@@ -96,7 +93,8 @@ def read_data(region):
 
 	# загружаем данные по заданой области из файла
 	print("Reading data from file " + url)
-	frame = pd.read_csv(url,						# адрес источника данных
+	frame = pd.read_csv(
+		url,						# адрес источника данных
         index_col=0,				# столбец индексов
 		parse_dates = ['datetime']	# восстанавливаем столбец даты
 	)
@@ -111,13 +109,10 @@ def find_min_max(frame, year):
 	'''
 
 	# обираємо вегетаційний період з вересня по липень наступного року
-	# frame = frame[frame['datetime'].between(datetime.date(year, 9, 1), datetime.date(year + 1, 8, 31))]
-	# starttme = datetime.date(year, 9, 1)
 	starttme = str(year) + '-09-01'
-	# endtime = datetime.date(year + 1, 8, 31)
-	endtime = str(year+1) + '-08-31'
-	# frame.set_index('datetime')
+	endtime = str(year + 1) + '-08-31'
 	frame = frame[(frame['datetime'] >= starttme) & (frame['datetime'] < endtime)]
+
 	# пошук екстремумів (min та max)
 	minvalue = frame['VHI'].idxmin()
 	maxvalue = frame['VHI'].idxmax()
@@ -125,65 +120,58 @@ def find_min_max(frame, year):
 	print("Maximum VHI value: " + str(frame['VHI'][maxvalue]) + " was on " + str(frame['datetime'][maxvalue].strftime('%d %B %Y')))
 
 	# відображення ряду VHI за вегетаційний період
-	plot(frame)
+	plot(frame, frame['VHI'][maxvalue])
 
 	return
 
 # =====================================================================
-def droughts(frame, percent):
+def plot(results, threshold):
 	'''
-	Ряд VHI за всі роки для області, виявити роки з екстремальними посухами, 
-	які торкнулися більше вказаного відсотка області
+	Графічне відображення результатів
+	з виводом порогового значення
 	'''
-	frame['VHI'] = frame['0'] + frame['5']
-	plot(frame)
+	
+	# Підготовка маркерів
+	years = mdates.YearLocator()			# every year
+	months = mdates.MonthLocator()			# every month
+	yearsFmt = mdates.DateFormatter('%Y')	# ticker format
 
-	return
+	# Підготовка графіка
+	fig, ax = plt.subplots()
+	ax.plot(results['datetime'], results['VHI'])
+	ax.xaxis.set_major_locator(years)
+	ax.xaxis.set_major_formatter(yearsFmt)
+	ax.xaxis.set_minor_locator(months)
+	fig.autofmt_xdate()
+	plt.title('VHI for the year')
+	plt.xlabel('Date')
+	plt.ylabel('VHI average')
+	plt.legend(loc='lower left')
+	plt.axhline(y=threshold, color='r', linestyle='-')
+	
+	# поліпшення графіка
+	plt.tight_layout()
 
-# =====================================================================
-def plot(results):
-    '''
-    Create a plot
-    '''
+	# показ графіка в вікні
+	plt.show()
 
-    # Preparing the plot
-    fig = plt.figure()
-    fig.canvas.set_window_title('VHI index')
-    plt.plot(results['datetime'], results['VHI'])
-
-    plt.title('VHI for the year')
-    plt.xlabel('Date')
-    plt.ylabel('VHI average')
-    plt.legend(loc='lower left')
-
-    # Let matplotlib improve the layout
-    plt.tight_layout()
-
-    # Display the plot in interactive UI
-    plt.show()
-
-    # Closing the figure allows matplotlib to release the memory used.
-    plt.close()
+	# закритті вікна, звільнення пам'яті
+	plt.close()
 
 # =====================================================================
 if __name__ == '__main__':
 	'''
 	Функція main
 	'''
-	
-	# устанавливаем рабочую директорию
-	#os.chdir("C:\\Users\\vladi\\OneDrive\\СЕМЬЯ\\Политех\\repos\\PythonClassifierApplication1")
-
 	# Task 1.
 	# Для кожної із адміністративних одиниць України завантажити тестові
-	# структуровані файли,
-	# що містять значення VHI-індексу
+	# структуровані файли, що містять значення VHI-індексу
 	# print("Downloading data")
 	# download_data()
 
 	# Task 2.
 	# Зчитати завантажені текстові файли у фрейм (за номером області)
-	region = '1'
+	region = '14'
 	frame = read_data(region)
 
 	# Task 3.
@@ -196,7 +184,12 @@ if __name__ == '__main__':
 	# Ряд VHI за всі роки для області,
 	# виявити роки з екстремальними посухами (6 < VHI < 15),
 	# які торкнулися більше вказаного відсотка області
-	droughts(frame, 10)
+	# нехай вказаний відсоток = 20%
+	percent = 20
+	frame['VHI'] = frame['10']
+	plot(frame, percent)
 
-	# Task 5. 
+	# Task 5.
 	# Аналогічно для помірних посух (26 < VHI < 35)
+	frame['VHI'] = frame['30']
+	plot(frame, percent)
