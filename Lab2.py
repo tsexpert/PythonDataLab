@@ -73,18 +73,18 @@ class WebDataOutput(server.App):
         "label": "Завантажити"
     }]
 
-	tabs = ["Plot", "Table"]
+	tabs = ["График", "Таблица"]
 
 	outputs = [{
             "type": "plot",
             "id": "plot",
             "control_id": "update_data",
-            "tab": "Plot"},
+            "tab": "График"},
         {
             "type": "table",
             "id": "table_id",
             "control_id": "update_data",
-            "tab": "Table",
+            "tab": "Таблица",
             "on_page_load": True
         }]
 
