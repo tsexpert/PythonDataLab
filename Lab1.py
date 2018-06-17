@@ -185,10 +185,9 @@ if __name__ == '__main__':
 	# виявити роки з екстремальними посухами (VHI < 15),
 	# які торкнулися більше вказаного відсотка області
 	# нехай вказаний відсоток = 20%
-    percent = 20
-
-    frame['VHI'] = frame['0'] + frame['5'] + frame['10']
-    plot(frame, percent)
+	percent = 20
+	frame['VHI'] = frame['0'] + frame['5'] + frame['10']
+	plot(frame, percent)
 
 	# Task 5.
 	# Аналогічно для помірних посух (15 < VHI < 35)
